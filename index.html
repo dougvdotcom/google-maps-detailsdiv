@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<!--
+			Using AJAX To Update A Non-Map DIV Via Google Maps API's GDownload() And GMarker OnClick Event
+			Copyright 2007 Doug Vanderweide
+					This program is free software: you can redistribute it and/or modify
+		it under the terms of the GNU General Public License as published by
+		the Free Software Foundation, either version 3 of the License, or
+		(at your option) any later version.
+
+		This program is distributed in the hope that it will be useful,
+		but WITHOUT ANY WARRANTY; without even the implied warranty of
+		MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+		GNU General Public License for more details.
+
+		You should have received a copy of the GNU General Public License
+		along with this program.  If not, see <http://www.gnu.org/licenses/>.
+		-->
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title>Using AJAX To Update A Non-Map DIV Via Google Maps API's GDownload() And GMarker OnClick Event</title>
+		<link href="../demo.css" rel="stylesheet" type="text/css" />
+		<script type="text/javascript" src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAynoIQZ5YX-BdZ9UvBsREmBTdnN6G66CbOAd5ryXk14zWHUvlaxQuno-HUh7x2lF8jtwWTCV-u8SS5w"></script>
+		<script type="text/javascript">
+			var map;
+			var details;
+			var dcenter = new GLatLng(44.30753551540104, -69.77983474731445);
+			var dzoom = 17;
+			
+			function pageLoad() {
+				map = new GMap2(document.getElementById('map'));
+				map.setMapType(G_HYBRID_MAP);
+				details = document.getElementById('details');
+				
+				map.setCenter(dcenter);
+				map.setZoom(dzoom);
+				map.addControl(new GSmallMapControl());
+				map.addControl(new GMapTypeControl());
+				map.disableDragging();
+				map.disableScrollWheelZoom();
+				map.disableDoubleClickZoom();
+				
+				addPoint(1, 'Capitol Park', 44.30616121527788, -69.77895498275757);
+				addPoint(2, 'State House', 44.307113247837854, -69.7816264629364);
+				addPoint(3, 'Burton M. Cross State Office Building', 44.30720537920164, -69.78294610977173);
+				addPoint(4, 'Blaine House (Governor\'s Mansion)', 44.308211137183676, -69.78119730949402);
+				addPoint(5, 'Cultural Building', 44.305754293425046, -69.78273153305054);
+				addPoint(6, 'Vietnam Veterans War Memorial', 44.30728215522767, -69.77898716926575);
+				addPoint(7, 'Department Of Labor Building', 44.30738196391136, -69.77783918380737);
+			}
+			
+			function addPoint(pid, name, lat, lng) {
+				var point = new GLatLng(lat, lng);
+				var marker = new GMarker(point);
+				map.addOverlay(marker);
+				
+				var info = '<strong>' + name + '</strong><br />';
+				info += 'For more information, click the icon.';
+				
+				GEvent.addListener(marker, 'mouseover', function() {
+					marker.openInfoWindow(info);
+				});
+				
+				GEvent.addListener(marker, 'mouseout', function() {
+					map.closeInfoWindow();
+				});
+				
+				GEvent.addListener(marker, 'click', function() {
+					details.innerHTML = '<em>Loading information ...</em>';
+					showDivInfo(pid);
+				});
+			}
+			
+			function showDivInfo(pid) {
+				var url = 'info.php?pid=' + pid;
+				GDownloadUrl(url, function(data, responseCode) {
+					details.innerHTML = data;
+				});
+			}
+			
+			function pageUnload() {
+				GUnload();
+			}
+		</script>
+
+		<style type="text/css">
+			div#map, div#details {
+				border: solid 1px #000;
+				margin: 10px;
+			}
+			
+			div#map {
+				width: 800px;
+				height: 570px;
+			}
+			
+			div#details {
+				width: 780px;
+				padding: 10px;
+			}
+		</style>
+	</head>
+	<body onload="pageLoad()" onunload="pageUnload()">
+	<h1>
+			Using AJAX To Update A Non-Map DIV Via Google Maps
+			API's GDownload() And GMarker OnClick Event
+	</h1>
+		<div id="map"></div>
+		<div id="details">Clicking on any of the icons above will reveal details about the marked item in this area.</div>
+		<p><a href="http://www.dougv.com/blog/2007/07/12/using-ajax-to-update-a-non-map-div-via-google-maps-apis-gdownload-and-gmarker-onclick-event/">Using AJAX To Update A Non-Map DIV Via Google Maps API&rsquo;s GDownload() And GMarker OnClick Event</a></p>
+		<p>&nbsp;</p>
+	</body>
+</html>
